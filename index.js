@@ -55,10 +55,22 @@ app.delete("/characters/:name", (req, res) => {
     }
     else {
         characters.splice(characterIndex, 1);
-        res.sendStatus(204);
+        res.status(204).send(req.body);
     }
 })
 
+// Patching a character.
+app.patch("/characters/:name", (req, res) => {
+    const name = req.params.name.toLowerCase();
+    const characterIndex = characters.findInded((character) => character.name.toLowerCase() == name)
+    const newCharacterName = req.body.name
+    if (character == undefined) {
+        res.status(404).send("The character does not exist.");
+    }
+    else {
+        res.sendStatus(200);
+    }
+})
 //Terminal status.
 app.listen(port, () => {
     console.log(`The app is listening on port ${port}`);
