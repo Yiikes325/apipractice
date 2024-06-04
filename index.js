@@ -1,10 +1,12 @@
 require('dotenv').config()
 
 const express = require('express')
+const cors = require('cors')
 const app = express()
 const port = process.env.PORT
 // Adding middleware.
 app.use(express.json());
+app.use(cors());
 
 const characters = require("./harrypotter.json")
 
@@ -62,16 +64,32 @@ app.delete("/characters/:name", (req, res) => {
 // Patching a character.
 app.patch("/characters/:name", (req, res) => {
     const name = req.params.name.toLowerCase();
-    const characterIndex = characters.findInded((character) => character.name.toLowerCase() == name)
+    const character = characters.find((character) => character.name.toLowerCase() == name)
     const newCharacterName = req.body.name
     if (character == undefined) {
         res.status(404).send("The character does not exist.");
     }
     else {
-        res.sendStatus(200);
+        character.name = newCharacterName
+        res.status(200).send(character)
     }
 })
-//Terminal status.
+
+// Patching a character using an object.
+app.patch("/characters/:id", (req, res) => {
+	let character = characters.find((character) => character.id == req.params.id);
+
+	if (!character) return res.sendStatus(404);
+
+	character = {
+		...character,
+		...req.body,
+	};
+
+	res.send(character);
+});
+
+// Terminal status.
 app.listen(port, () => {
     console.log(`The app is listening on port ${port}`);
 })
